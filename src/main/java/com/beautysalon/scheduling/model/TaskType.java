@@ -12,12 +12,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "TypeTask")
-@Table(name = "TypeTask")
+@Entity(name = "TaskType")
+@Table(name = "TaskType")
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-public class TypeTask {
+public class TaskType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

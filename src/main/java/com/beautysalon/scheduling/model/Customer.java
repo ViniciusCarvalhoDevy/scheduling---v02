@@ -9,12 +9,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "Constumer")
-@Table(name = "Constumer")
+@Entity(name = "Customer")
+@Table(name = "Customer")
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-public class Constumer {
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

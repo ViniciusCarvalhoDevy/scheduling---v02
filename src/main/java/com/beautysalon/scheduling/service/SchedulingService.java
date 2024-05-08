@@ -9,17 +9,26 @@ import org.springframework.stereotype.Service;
 
 import com.beautysalon.scheduling.model.Scheduling;
 import com.beautysalon.scheduling.model.exception.ResourceNotFoundException;
+import com.beautysalon.scheduling.repository.CustomerRepository;
+import com.beautysalon.scheduling.repository.ProfessionalUserRepository;
 import com.beautysalon.scheduling.repository.SchedulingRepository;
-import com.beautysalon.scheduling.shared.ConstumerDTO;
+import com.beautysalon.scheduling.repository.TaskTypeRepository;
+import com.beautysalon.scheduling.shared.CustomerDTO;
 import com.beautysalon.scheduling.shared.ProfessionalUserDTO;
 import com.beautysalon.scheduling.shared.SchedulingDTO;
-import com.beautysalon.scheduling.shared.TypeTaskDTO;
+import com.beautysalon.scheduling.shared.TaskTypeDTO;
 import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
 
 @Service
 public class SchedulingService implements instancesGlobal {
     @Autowired
     private SchedulingRepository schedulingRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private TaskTypeRepository taskTypeRepository;
+    @Autowired
+    private ProfessionalUserRepository professionalUserRepository;
 
     public List<SchedulingDTO> getAll(){
         List<Scheduling> scheduling = schedulingRepository.findAll();
@@ -47,19 +56,19 @@ public class SchedulingService implements instancesGlobal {
         schedulingDTO.setId(scheduling.getId());
         return schedulingDTO;
     }
-    public List<ConstumerDTO> findAllByIdClient(List<Long> ids){
-        List<ConstumerDTO> dClientDTOs = (schedulingRepository.findAllByIdClient(ids)).stream()
-        .map(cl -> mapper.map(cl,ConstumerDTO.class))
+    public List<CustomerDTO> findAllSchedulingByIdClient(List<Long> ids){
+        List<CustomerDTO> dClientDTOs = (schedulingRepository.findAllByIdClient(ids)).stream()
+        .map(cl -> mapper.map(cl,CustomerDTO.class))
         .collect(Collectors.toList());
         return dClientDTOs;
     }
-    public List<TypeTaskDTO> findAllByIdTask(List<Long> ids){
-        List<TypeTaskDTO> dTaskDTOs= (schedulingRepository.findAllByIdTypeTask(ids)).stream()
-        .map(cl -> mapper.map(cl,TypeTaskDTO.class))
+    public List<TaskTypeDTO> findAllSchedulingByIdTask(List<Long> ids){
+        List<TaskTypeDTO> dTaskDTOs= (schedulingRepository.findAllByIdTypeTask(ids)).stream()
+        .map(cl -> mapper.map(cl,TaskTypeDTO.class))
         .collect(Collectors.toList());
         return dTaskDTOs;
     }
-    public List<ProfessionalUserDTO> findAllByIdProfessUser(List<Long> ids){
+    public List<ProfessionalUserDTO> findAllSchedulingByIdProfessUser(List<Long> ids){
         List<ProfessionalUserDTO> dUserDTOs = (schedulingRepository.findAllByIdUserProfissional(ids)).stream()
         .map(cl -> mapper.map(cl,ProfessionalUserDTO.class))
         .collect(Collectors.toList());

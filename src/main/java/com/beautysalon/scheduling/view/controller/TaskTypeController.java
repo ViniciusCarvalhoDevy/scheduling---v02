@@ -15,24 +15,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beautysalon.scheduling.service.TypeTaskService;
-import com.beautysalon.scheduling.shared.TypeTaskDTO;
+import com.beautysalon.scheduling.service.TaskTypeService;
+import com.beautysalon.scheduling.shared.TaskTypeDTO;
 
 @RestController
 @RequestMapping("/restfull/v01/services")
-public class TypeTaskController {
+public class TaskTypeController {
     @Autowired
-    private TypeTaskService taskRepository;
+    private TaskTypeService taskRepository;
 
     @GetMapping
-    public ResponseEntity<List<TypeTaskDTO>> getAll() {
-        List<TypeTaskDTO> typeTaskDTOs = taskRepository.getAll();
+    public ResponseEntity<List<TaskTypeDTO>> getAll() {
+        List<TaskTypeDTO> typeTaskDTOs = taskRepository.getAll();
         return new ResponseEntity<>(typeTaskDTOs,HttpStatus.OK);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<TypeTaskDTO> getForId(@PathVariable Long id){
+    public ResponseEntity<TaskTypeDTO> getForId(@PathVariable Long id){
 
-        Optional<TypeTaskDTO> tOptional = taskRepository.getById(id);
+        Optional<TaskTypeDTO> tOptional = taskRepository.getById(id);
         return new ResponseEntity<>(tOptional.get(),HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
@@ -41,12 +41,12 @@ public class TypeTaskController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PostMapping
-    public ResponseEntity<TypeTaskDTO> register(@RequestBody TypeTaskDTO typeTaskDTO){
+    public ResponseEntity<TaskTypeDTO> register(@RequestBody TaskTypeDTO typeTaskDTO){
         typeTaskDTO = taskRepository.register(typeTaskDTO);
         return new ResponseEntity<>(typeTaskDTO,HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<TypeTaskDTO> update(@RequestBody TypeTaskDTO typeTaskDTO,@PathVariable Long id){
+    public ResponseEntity<TaskTypeDTO> update(@RequestBody TaskTypeDTO typeTaskDTO,@PathVariable Long id){
         typeTaskDTO = taskRepository.update(id, typeTaskDTO);
         return new ResponseEntity<>(typeTaskDTO,HttpStatus.OK);
     }

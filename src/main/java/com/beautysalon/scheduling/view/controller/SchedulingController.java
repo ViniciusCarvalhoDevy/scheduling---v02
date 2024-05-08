@@ -17,11 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beautysalon.scheduling.service.CustomerService;
+import com.beautysalon.scheduling.service.ProfessionalUserService;
 import com.beautysalon.scheduling.service.SchedulingService;
-import com.beautysalon.scheduling.shared.ConstumerDTO;
+import com.beautysalon.scheduling.service.TaskTypeService;
+import com.beautysalon.scheduling.shared.CustomerDTO;
 import com.beautysalon.scheduling.shared.ProfessionalUserDTO;
 import com.beautysalon.scheduling.shared.SchedulingDTO;
-import com.beautysalon.scheduling.shared.TypeTaskDTO;
+import com.beautysalon.scheduling.shared.TaskTypeDTO;
 import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
 import com.beautysalon.scheduling.view.model.SchedulingHttp.SchedulingRequest;
 import com.beautysalon.scheduling.view.model.SchedulingHttp.SchedulingResponse;
@@ -30,10 +33,17 @@ import com.beautysalon.scheduling.view.model.SchedulingHttp.SchedulingResponse;
 public class SchedulingController implements instancesGlobal {
      @Autowired
     private SchedulingService schedulingService;
+     @Autowired
+    private CustomerService customerService;
+     @Autowired
+    private TaskTypeService taskTypeService;
+     @Autowired
+    private ProfessionalUserService professionalUserService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<SchedulingResponse>> getAll() {
         List<SchedulingDTO> schedulingDTOs = schedulingService.getAll();
+        System.err.println(schedulingDTOs);
         List<SchedulingResponse> schedulingResponses = schedulingDTOs.stream()
         .map(sch -> mapper.map(sch,SchedulingResponse.class))
         .collect(Collectors.toList());
@@ -53,16 +63,19 @@ public class SchedulingController implements instancesGlobal {
     }
     @PostMapping
     public ResponseEntity<SchedulingResponse> register(@Validated @RequestBody SchedulingRequest schedulingRequest){
+        List<CustomerDTO> customerDTOs = customerService.findAllByIdClient(schedulingRequest.getIdClient());
+        List<TaskTypeDTO> taskTypeDTOs = taskTypeService.findAllByIdTask(schedulingRequest.getIdTypeTask());
+        List<ProfessionalUserDTO> professionalUserDTOs = professionalUserService.findAllByIdProfessUser(schedulingRequest.getIdUserProfissional());
         SchedulingDTO schedulingDTO = mapper.map(schedulingRequest,SchedulingDTO.class);
         
         schedulingDTO.setIdClient(
-            (schedulingService.findAllByIdClient(schedulingRequest.getIdClient()))
+            customerDTOs
         );
         schedulingDTO.setIdTypeTask(
-            (schedulingService.findAllByIdTask(schedulingRequest.getIdTypeTask()))
+            taskTypeDTOs
         );
         schedulingDTO.setIdUserProfissional(
-            (schedulingService.findAllByIdProfessUser(schedulingRequest.getIdUserProfissional()))
+            professionalUserDTOs
         );
         schedulingDTO = schedulingService.register(schedulingDTO);
         SchedulingResponse schedilingResponse = mapper.map(schedulingDTO, SchedulingResponse.class);
@@ -72,35 +85,35 @@ public class SchedulingController implements instancesGlobal {
     public ResponseEntity<SchedulingResponse> update(@Validated @RequestBody SchedulingRequest schedulingRequest,@PathVariable Long id){
         SchedulingDTO schedulingDTO = mapper.map(schedulingRequest,SchedulingDTO.class);
         schedulingDTO.setIdClient(
-            (schedulingService.findAllByIdClient(schedulingRequest.getIdClient()))
+            (customerService.findAllByIdClient(schedulingRequest.getIdClient()))
         );
         schedulingDTO.setIdTypeTask(
-            (schedulingService.findAllByIdTask(schedulingRequest.getIdTypeTask()))
+            (taskTypeService.findAllByIdTask(schedulingRequest.getIdTypeTask()))
         );
         schedulingDTO.setIdUserProfissional(
-            (schedulingService.findAllByIdProfessUser(schedulingRequest.getIdUserProfissional()))
+            (professionalUserService.findAllByIdProfessUser(schedulingRequest.getIdUserProfissional()))
         );
         schedulingDTO = schedulingService.update(id, schedulingDTO);
         SchedulingResponse schedilingResponse = mapper.map(schedulingDTO, SchedulingResponse.class);
         return new ResponseEntity<>(schedilingResponse,HttpStatus.OK);
     }
     @GetMapping("/tasks")
-    public ResponseEntity<List<TypeTaskDTO>> findSchedulingForIdsTask(@RequestBody List<Long> ids){
-        List<TypeTaskDTO> taskDTO = (schedulingService.findAllByIdTask(ids)).stream()
-        .map(task -> mapper.map(task,TypeTaskDTO.class))
+    public ResponseEntity<List<TaskTypeDTO>> findSchedulingForIdsTask(@RequestBody List<Long> ids){
+        List<TaskTypeDTO> taskDTO = (schedulingService.findAllSchedulingByIdTask(ids)).stream()
+        .map(task -> mapper.map(task,TaskTypeDTO.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(taskDTO,HttpStatus.OK);
     }
     @GetMapping("/clients")
-    public ResponseEntity<List<ConstumerDTO>> findSchedulingForIdsClient(@RequestBody List<Long> ids){
-        List<ConstumerDTO> clientDTOs = (schedulingService.findAllByIdClient(ids)).stream()
-        .map(cl -> mapper.map(cl,ConstumerDTO.class))
+    public ResponseEntity<List<CustomerDTO>> findSchedulingForIdsClient(@RequestBody List<Long> ids){
+        List<CustomerDTO> clientDTOs = (schedulingService.findAllSchedulingByIdClient(ids)).stream()
+        .map(cl -> mapper.map(cl,CustomerDTO.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(clientDTOs,HttpStatus.OK);
     }
     @GetMapping("/profss")
     public ResponseEntity<List<ProfessionalUserDTO>> findSchedulingForIdsProfessUser(@RequestBody List<Long> ids){
-        List<ProfessionalUserDTO> professionalUserDTOs = (schedulingService.findAllByIdProfessUser(ids)).stream()
+        List<ProfessionalUserDTO> professionalUserDTOs = (schedulingService.findAllSchedulingByIdProfessUser(ids)).stream()
         .map(proUser -> mapper.map(proUser,ProfessionalUserDTO.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(professionalUserDTOs,HttpStatus.OK);

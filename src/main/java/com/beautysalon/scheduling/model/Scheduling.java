@@ -33,17 +33,17 @@ public class Scheduling {
     private List<ProfessionalUser> idUserProfissional;
     
     @OneToMany
-    @JoinColumn(name = "Client_id")
+    @JoinColumn(name = "Customer_id")
     @EqualsAndHashCode.Include
-    private List<Constumer> idClient;
+    private List<Customer> idClient;
     
     @OneToMany
-    @JoinColumn(name = "TypeTask_id")
+    @JoinColumn(name = "TaskType_id")
     @EqualsAndHashCode.Include
-    private List<TypeTask> idTypeTask;
+    private List<TaskType> idTypeTask;
     
     private String phone;
     private LocalDate dateAgend;
     private LocalTime horsTime;
-    private BigDecimal totalValueService;
-}
+    private BigDecimal totalValueService ;
+} 

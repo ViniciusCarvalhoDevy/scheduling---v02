@@ -2,8 +2,8 @@ package com.beautysalon.scheduling.view.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beautysalon.scheduling.service.ConstumerService;
-import com.beautysalon.scheduling.shared.ConstumerDTO;
+import com.beautysalon.scheduling.service.CustomerService;
+import com.beautysalon.scheduling.shared.CustomerDTO;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,20 +23,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/restfull/v01/client")
-public class CostumerController {
+public class CustomerController {
     
     @Autowired
-    private ConstumerService clientService;
+    private CustomerService clientService;
 
     @GetMapping
-    public ResponseEntity<List<ConstumerDTO>> getAll() {
-        List<ConstumerDTO> clientDTOs = clientService.getAll();
+    public ResponseEntity<List<CustomerDTO>> getAll() {
+        List<CustomerDTO> clientDTOs = clientService.getAll();
         return new ResponseEntity<>(clientDTOs,HttpStatus.OK);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ConstumerDTO> getForId(@PathVariable Long id){
+    public ResponseEntity<CustomerDTO> getForId(@PathVariable Long id){
 
-        Optional<ConstumerDTO> clientDTO = clientService.getById(id);
+        Optional<CustomerDTO> clientDTO = clientService.getById(id);
         return new ResponseEntity<>(clientDTO.get(),HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
@@ -45,12 +45,12 @@ public class CostumerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PostMapping
-    public ResponseEntity<ConstumerDTO> register(@RequestBody ConstumerDTO clientDTO){
+    public ResponseEntity<CustomerDTO> register(@RequestBody CustomerDTO clientDTO){
         clientDTO = clientService.register(clientDTO);
         return new ResponseEntity<>(clientDTO,HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ConstumerDTO> update(@RequestBody ConstumerDTO clientDTO,@PathVariable Long id){
+    public ResponseEntity<CustomerDTO> update(@RequestBody CustomerDTO clientDTO,@PathVariable Long id){
         clientDTO = clientService.update(id, clientDTO);
         return new ResponseEntity<>(clientDTO,HttpStatus.OK);
     }

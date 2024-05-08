@@ -16,8 +16,8 @@ import lombok.Setter;
 public class SchedulingDTO {
     private Long id;
     private List<ProfessionalUserDTO> idUserProfissional;
-    private List<ConstumerDTO> idClient;
-    private List<TypeTaskDTO> idTypeTask;
+    private List<CustomerDTO> idClient;
+    private List<TaskTypeDTO> idTypeTask;
     private String phone;
     private LocalDate dateAgend;
     private LocalTime horsTime;

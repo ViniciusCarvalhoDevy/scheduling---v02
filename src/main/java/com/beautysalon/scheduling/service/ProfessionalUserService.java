@@ -99,4 +99,10 @@ public class ProfessionalUserService implements instancesGlobal {
            
 
     }
+    public List<ProfessionalUserDTO> findAllByIdProfessUser(List<Long> ids){
+        List<ProfessionalUserDTO> dUserDTOs = (professionalUserRepository.findAllById(ids)).stream()
+        .map(cl -> mapper.map(cl,ProfessionalUserDTO.class))
+        .collect(Collectors.toList());
+        return dUserDTOs;
+    }
 }
