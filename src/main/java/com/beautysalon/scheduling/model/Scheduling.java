@@ -10,8 +10,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,23 +29,43 @@ public class Scheduling {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
-    @OneToMany
-    @JoinColumn(name = "ProfessionalUser_id")
+    @ManyToMany
+    @JoinTable(
+        name = "scheduling_professional",
+        joinColumns = @JoinColumn(name = "scheduling_id"),
+        inverseJoinColumns = @JoinColumn(name = "ProfessionalUser_id")
+        )
     @EqualsAndHashCode.Include
     private List<ProfessionalUser> idUserProfissional;
     
-    @OneToMany
-    @JoinColumn(name = "Customer_id")
+    @ManyToMany
+    @JoinTable(
+        name = "scheduling_customer",
+        joinColumns = @JoinColumn(name = "scheduling_id"),
+        inverseJoinColumns = @JoinColumn(name = "Customer_id")
+        )
     @EqualsAndHashCode.Include
     private List<Customer> idClient;
     
-    @OneToMany
-    @JoinColumn(name = "TaskType_id")
+    @ManyToMany
+    @JoinTable(
+        name = "scheduling_task",
+        joinColumns = @JoinColumn(name = "scheduling_id"),
+        inverseJoinColumns = @JoinColumn(name = "TaskType_id")
+        )
     @EqualsAndHashCode.Include
     private List<TaskType> idTypeTask;
     
     private String phone;
     private LocalDate dateAgend;
     private LocalTime horsTime;
-    private BigDecimal totalValueService ;
+    private BigDecimal totalValueTask;
+
+    @PrePersist // Diz que essa função será executada antes de os dados pessistirem no banco.
+    @PreUpdate // Diz que essa função será executada antes de o spring atualizar a entidade.
+    public void calculaateTotalValueTask(){
+        this.totalValueTask = idTypeTask.stream()
+        .map(TaskType::getValue)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 } 

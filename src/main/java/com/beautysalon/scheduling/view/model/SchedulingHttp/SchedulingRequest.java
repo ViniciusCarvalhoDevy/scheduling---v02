@@ -20,5 +20,4 @@ public class SchedulingRequest {
     private String phone;
     private LocalDate dateAgend;
     private LocalTime horsTime;
-    private BigDecimal totalValueService;
 }
