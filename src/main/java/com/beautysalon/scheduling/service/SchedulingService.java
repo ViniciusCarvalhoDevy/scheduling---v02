@@ -1,5 +1,6 @@
 package com.beautysalon.scheduling.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,28 +8,21 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.beautysalon.scheduling.model.Customer;
+import com.beautysalon.scheduling.model.ProfessionalUser;
 import com.beautysalon.scheduling.model.Scheduling;
+import com.beautysalon.scheduling.model.TaskType;
 import com.beautysalon.scheduling.model.exception.ResourceNotFoundException;
-import com.beautysalon.scheduling.repository.CustomerRepository;
-import com.beautysalon.scheduling.repository.ProfessionalUserRepository;
 import com.beautysalon.scheduling.repository.SchedulingRepository;
-import com.beautysalon.scheduling.repository.TaskTypeRepository;
-import com.beautysalon.scheduling.shared.CustomerDTO;
 import com.beautysalon.scheduling.shared.ProfessionalUserDTO;
 import com.beautysalon.scheduling.shared.SchedulingDTO;
-import com.beautysalon.scheduling.shared.TaskTypeDTO;
 import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
 
 @Service
 public class SchedulingService implements instancesGlobal {
     @Autowired
     private SchedulingRepository schedulingRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private TaskTypeRepository taskTypeRepository;
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
+
 
     public List<SchedulingDTO> getAll(){
         List<Scheduling> scheduling = schedulingRepository.findAll();
@@ -54,25 +48,32 @@ public class SchedulingService implements instancesGlobal {
         Scheduling scheduling = mapper.map(schedulingDTO,Scheduling.class);
         scheduling = schedulingRepository.save(scheduling);
         schedulingDTO.setId(scheduling.getId());
+        schedulingDTO.setTotalValueTask(scheduling.getTotalValueTask());
         return schedulingDTO;
     }
-    public List<CustomerDTO> findAllSchedulingByIdClient(List<Long> ids){
-        List<CustomerDTO> dClientDTOs = (schedulingRepository.findAllByIdClient(ids)).stream()
-        .map(cl -> mapper.map(cl,CustomerDTO.class))
+    public List<SchedulingDTO> findAllSchedulingByIdClient(Long id){
+        Customer customer = new Customer();
+        customer.setId(id);
+        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByIdClient(customer)).stream()
+        .map(cl -> mapper.map(cl,SchedulingDTO.class))
         .collect(Collectors.toList());
-        return dClientDTOs;
+        return schedulingDTOs;
     }
-    public List<TaskTypeDTO> findAllSchedulingByIdTask(List<Long> ids){
-        List<TaskTypeDTO> dTaskDTOs= (schedulingRepository.findAllByIdTypeTask(ids)).stream()
-        .map(cl -> mapper.map(cl,TaskTypeDTO.class))
+    public List<SchedulingDTO> findAllSchedulingByIdTask(Long id){
+        TaskType taskType = new TaskType();
+        taskType.setId(id);
+        List<SchedulingDTO> schedulingDTOs= (schedulingRepository.findByIdTypeTask(taskType)).stream()
+        .map(cl -> mapper.map(cl,SchedulingDTO.class))
         .collect(Collectors.toList());
-        return dTaskDTOs;
+        return schedulingDTOs;
     }
-    public List<ProfessionalUserDTO> findAllSchedulingByIdProfessUser(List<Long> ids){
-        List<ProfessionalUserDTO> dUserDTOs = (schedulingRepository.findAllByIdUserProfissional(ids)).stream()
-        .map(cl -> mapper.map(cl,ProfessionalUserDTO.class))
+    public List<SchedulingDTO> findSchedulingByIdProfessUser(Long id){
+        ProfessionalUser professionalUser = new ProfessionalUser();
+        professionalUser.setId(id);
+        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByIdUserProfissional(professionalUser)).stream()
+        .map(cl -> mapper.map(cl,SchedulingDTO.class))
         .collect(Collectors.toList());
-        return dUserDTOs;
+        return schedulingDTOs;
     }
 
     public void delete(Long id){
