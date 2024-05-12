@@ -1,6 +1,5 @@
 package com.beautysalon.scheduling.view.model.SchedulingHttp;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
