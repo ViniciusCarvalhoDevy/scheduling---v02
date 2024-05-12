@@ -62,7 +62,7 @@ public class SchedulingController implements instancesGlobal {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PostMapping
-    public ResponseEntity<SchedulingResponse> register(@Validated @RequestBody SchedulingRequest schedulingRequest){
+    public ResponseEntity<SchedulingResponse> register(@Validated @RequestBody SchedulingRequest schedulingRequest) throws Exception{
         List<CustomerDTO> customerDTOs = customerService.findAllByIdClient(schedulingRequest.getIdClient());
         List<TaskTypeDTO> taskTypeDTOs = taskTypeService.findAllByIdTask(schedulingRequest.getIdTypeTask());
         List<ProfessionalUserDTO> professionalUserDTOs = professionalUserService.findAllByIdProfessUser(schedulingRequest.getIdUserProfissional());
@@ -98,14 +98,14 @@ public class SchedulingController implements instancesGlobal {
         return new ResponseEntity<>(schedilingResponse,HttpStatus.OK);
     }
     @GetMapping("/tasks/{id}")
-    public ResponseEntity<List<SchedulingResponse>> findSchedulingForIdsTask(@RequestBody Long id){
+    public ResponseEntity<List<SchedulingResponse>> findSchedulingForIdsTask(@PathVariable Long id){
         List<SchedulingResponse> schedulingDTOs = (schedulingService.findAllSchedulingByIdTask(id)).stream()
         .map(proUser -> mapper.map(proUser,SchedulingResponse.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(schedulingDTOs,HttpStatus.OK);
     }
     @GetMapping("/clients/{id}")
-    public ResponseEntity<List<SchedulingResponse>> findSchedulingForIdsClient(@RequestBody Long id){
+    public ResponseEntity<List<SchedulingResponse>> findSchedulingForIdsClient(@PathVariable Long id){
         List<SchedulingResponse> schedulingDTOs = (schedulingService.findAllSchedulingByIdClient(id)).stream()
         .map(proUser -> mapper.map(proUser,SchedulingResponse.class))
         .collect(Collectors.toList());

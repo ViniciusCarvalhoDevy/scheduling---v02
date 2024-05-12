@@ -1,6 +1,6 @@
 package com.beautysalon.scheduling.service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,9 +14,10 @@ import com.beautysalon.scheduling.model.Scheduling;
 import com.beautysalon.scheduling.model.TaskType;
 import com.beautysalon.scheduling.model.exception.ResourceNotFoundException;
 import com.beautysalon.scheduling.repository.SchedulingRepository;
-import com.beautysalon.scheduling.shared.ProfessionalUserDTO;
 import com.beautysalon.scheduling.shared.SchedulingDTO;
 import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
+import com.beautysalon.scheduling.util.validations.validModelScheduling;
+
 
 @Service
 public class SchedulingService implements instancesGlobal {
@@ -44,8 +45,12 @@ public class SchedulingService implements instancesGlobal {
         return Optional.of(schedulingDTO);
     }
 
-    public SchedulingDTO register(SchedulingDTO schedulingDTO){
+    public SchedulingDTO register(SchedulingDTO schedulingDTO) throws Exception{
         Scheduling scheduling = mapper.map(schedulingDTO,Scheduling.class);
+        
+        validModelScheduling.getInstanceSingleton()
+        .existClientAndProfessionalDuplicated(schedulingDTO,findSchedulingByDateAndHoursTime(schedulingDTO));
+        
         scheduling = schedulingRepository.save(scheduling);
         schedulingDTO.setId(scheduling.getId());
         schedulingDTO.setTotalValueTask(scheduling.getTotalValueTask());
@@ -71,6 +76,18 @@ public class SchedulingService implements instancesGlobal {
         ProfessionalUser professionalUser = new ProfessionalUser();
         professionalUser.setId(id);
         List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByIdUserProfissional(professionalUser)).stream()
+        .map(cl -> mapper.map(cl,SchedulingDTO.class))
+        .collect(Collectors.toList());
+        return schedulingDTOs;
+    }
+    public List<SchedulingDTO> findSchedulingByDateAndHoursTime(SchedulingDTO schedulingDTO){
+        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByDateAgendAndHorsTime(schedulingDTO.getDateAgend(),schedulingDTO.getHorsTime())).stream()
+        .map(cl -> mapper.map(cl,SchedulingDTO.class))
+        .collect(Collectors.toList());
+        return schedulingDTOs;
+    }
+    public List<SchedulingDTO> findSchedulingByDate(SchedulingDTO schedulingDTO){
+        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByDateAgend(schedulingDTO.getDateAgend())).stream()
         .map(cl -> mapper.map(cl,SchedulingDTO.class))
         .collect(Collectors.toList());
         return schedulingDTOs;
