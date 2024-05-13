@@ -95,6 +95,7 @@ public class SchedulingService{
         schedulingDTO.setId(id);
         Scheduling scheduling = convertersScheduling.convertesDTOInScheduling(schedulingDTO);
         scheduling = schedulingRepository.save(scheduling);
+        schedulingDTO.setTotalValueTask(scheduling.getTotalValueTask());
         return schedulingDTO;
     }
     public void schedulingExist(SchedulingRepository schedulingRepository,Long id){

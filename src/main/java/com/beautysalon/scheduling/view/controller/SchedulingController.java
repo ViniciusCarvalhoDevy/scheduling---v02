@@ -59,6 +59,7 @@ public class SchedulingController{
         setListOfCustomerInScheduling(customerService, schedulingDTO, schedulingRequest);
         setListOfTaskInScheduling(taskTypeService, schedulingDTO, schedulingRequest);
         setListOfProfessionalInScheduling(professionalUserService, schedulingDTO, schedulingRequest);
+        schedulingDTO = schedulingService.register(schedulingDTO);
         SchedulingResponse schedilingResponse = convertersScheduling.convertesDTOInResponseScheduling(schedulingDTO);
         return new ResponseEntity<>(schedilingResponse,HttpStatus.CREATED);
     }
