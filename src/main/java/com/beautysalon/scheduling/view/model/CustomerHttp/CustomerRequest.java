@@ -1,4 +1,4 @@
-package com.beautysalon.scheduling.view.model.Customer;
+package com.beautysalon.scheduling.view.model.CustomerHttp;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

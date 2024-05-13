@@ -1,4 +1,4 @@
-package com.beautysalon.scheduling.view.model.TypeTaskHttp;
+package com.beautysalon.scheduling.view.model.TaskTypeHttp;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;

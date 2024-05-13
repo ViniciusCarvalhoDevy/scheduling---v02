@@ -3,7 +3,6 @@ package com.beautysalon.scheduling.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,81 +14,74 @@ import com.beautysalon.scheduling.model.TaskType;
 import com.beautysalon.scheduling.model.exception.ResourceNotFoundException;
 import com.beautysalon.scheduling.repository.SchedulingRepository;
 import com.beautysalon.scheduling.shared.SchedulingDTO;
-import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
+import com.beautysalon.scheduling.util.functions.scheduling.convertersScheduling;
 import com.beautysalon.scheduling.util.validations.validModelScheduling;
 
 
 @Service
-public class SchedulingService implements instancesGlobal {
+public class SchedulingService{
     @Autowired
     private SchedulingRepository schedulingRepository;
 
 
     public List<SchedulingDTO> getAll(){
-        List<Scheduling> scheduling = schedulingRepository.findAll();
-        if(scheduling.isEmpty()){
-            throw new ResourceNotFoundException("Nenhum Agendamento Encontrado!");
-        }
-
-        List<SchedulingDTO> schedulingDTOs = scheduling.stream()
-        .map(sh -> mapper.map(sh,SchedulingDTO.class))
-        .collect(Collectors.toList());
-
+        List<Scheduling> schedulings = schedulingRepository.findAll();
+        isEmpty(schedulings);
+        List<SchedulingDTO> schedulingDTOs = convertersScheduling.convertesListSchedulingInDTOs(schedulings);
         return schedulingDTOs;
-
     }
+
     public Optional<SchedulingDTO> getById(Long id){
         schedulingExist(schedulingRepository,id);
-        Optional<Scheduling> shOptional = schedulingRepository.findById(id);
-        SchedulingDTO schedulingDTO = mapper.map(shOptional.get(), SchedulingDTO.class);
+        Optional<Scheduling> schedOptional = schedulingRepository.findById(id);
+        SchedulingDTO schedulingDTO = convertersScheduling.convertesSchedulingInDTO(schedOptional.get());
         return Optional.of(schedulingDTO);
     }
 
     public SchedulingDTO register(SchedulingDTO schedulingDTO) throws Exception{
-        Scheduling scheduling = mapper.map(schedulingDTO,Scheduling.class);
-        
+        Scheduling scheduling = convertersScheduling.convertesDTOInScheduling(schedulingDTO);
         validModelScheduling.getInstanceSingleton()
         .existClientAndProfessionalDuplicated(schedulingDTO,findSchedulingByDateAndHoursTime(schedulingDTO));
-        
         scheduling = schedulingRepository.save(scheduling);
         schedulingDTO.setId(scheduling.getId());
         schedulingDTO.setTotalValueTask(scheduling.getTotalValueTask());
         return schedulingDTO;
     }
+    
     public List<SchedulingDTO> findAllSchedulingByIdClient(Long id){
         Customer customer = new Customer();
         customer.setId(id);
-        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByIdClient(customer)).stream()
-        .map(cl -> mapper.map(cl,SchedulingDTO.class))
-        .collect(Collectors.toList());
+        List<SchedulingDTO> schedulingDTOs = convertersScheduling.
+        convertesListSchedulingInDTOs((schedulingRepository.findByIdClient(customer)));    
         return schedulingDTOs;
     }
     public List<SchedulingDTO> findAllSchedulingByIdTask(Long id){
         TaskType taskType = new TaskType();
         taskType.setId(id);
-        List<SchedulingDTO> schedulingDTOs= (schedulingRepository.findByIdTypeTask(taskType)).stream()
-        .map(cl -> mapper.map(cl,SchedulingDTO.class))
-        .collect(Collectors.toList());
+        List<SchedulingDTO> schedulingDTOs =convertersScheduling
+        .convertesListSchedulingInDTOs((schedulingRepository.findByIdTypeTask(taskType)));
         return schedulingDTOs;
     }
+
     public List<SchedulingDTO> findSchedulingByIdProfessUser(Long id){
         ProfessionalUser professionalUser = new ProfessionalUser();
         professionalUser.setId(id);
-        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByIdUserProfissional(professionalUser)).stream()
-        .map(cl -> mapper.map(cl,SchedulingDTO.class))
-        .collect(Collectors.toList());
+        List<SchedulingDTO> schedulingDTOs = convertersScheduling
+        .convertesListSchedulingInDTOs((schedulingRepository.findByIdUserProfissional(professionalUser))) ;
+
         return schedulingDTOs;
     }
     public List<SchedulingDTO> findSchedulingByDateAndHoursTime(SchedulingDTO schedulingDTO){
-        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByDateAgendAndHorsTime(schedulingDTO.getDateAgend(),schedulingDTO.getHorsTime())).stream()
-        .map(cl -> mapper.map(cl,SchedulingDTO.class))
-        .collect(Collectors.toList());
+        List<SchedulingDTO> schedulingDTOs = convertersScheduling
+        .convertesListSchedulingInDTOs((
+            schedulingRepository
+            .findByDateAgendAndHorsTime(schedulingDTO.getDateAgend(),schedulingDTO.getHorsTime())
+            ));
         return schedulingDTOs;
     }
     public List<SchedulingDTO> findSchedulingByDate(SchedulingDTO schedulingDTO){
-        List<SchedulingDTO> schedulingDTOs = (schedulingRepository.findByDateAgend(schedulingDTO.getDateAgend())).stream()
-        .map(cl -> mapper.map(cl,SchedulingDTO.class))
-        .collect(Collectors.toList());
+        List<SchedulingDTO> schedulingDTOs = convertersScheduling
+        .convertesListSchedulingInDTOs((schedulingRepository.findByDateAgend(schedulingDTO.getDateAgend())));
         return schedulingDTOs;
     }
 
@@ -101,13 +93,18 @@ public class SchedulingService implements instancesGlobal {
     public SchedulingDTO update(Long id, SchedulingDTO schedulingDTO){
         schedulingExist(schedulingRepository,id);
         schedulingDTO.setId(id);
-        Scheduling scheduling = mapper.map(schedulingDTO,Scheduling.class);
+        Scheduling scheduling = convertersScheduling.convertesDTOInScheduling(schedulingDTO);
         scheduling = schedulingRepository.save(scheduling);
         return schedulingDTO;
     }
     public void schedulingExist(SchedulingRepository schedulingRepository,Long id){
         if(!schedulingRepository.existsById(id)){
             throw new ResourceNotFoundException("Esse Agendamento não existe!");
+        }
+    }
+    private void isEmpty(List<Scheduling> schedulings){
+        if(schedulings.isEmpty()){
+            throw new ResourceNotFoundException("Nenhum Agendamento Encontrado!");
         }
     }
 

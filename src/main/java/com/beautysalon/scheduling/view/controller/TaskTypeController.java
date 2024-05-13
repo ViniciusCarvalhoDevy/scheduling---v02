@@ -17,38 +17,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beautysalon.scheduling.service.TaskTypeService;
 import com.beautysalon.scheduling.shared.TaskTypeDTO;
+import com.beautysalon.scheduling.util.functions.task.convertersTask;
+import com.beautysalon.scheduling.view.model.TaskTypeHttp.TaskTypeRequest;
+import com.beautysalon.scheduling.view.model.TaskTypeHttp.TaskTypeResponse;
 
 @RestController
 @RequestMapping("/restfull/v01/services")
-public class TaskTypeController {
+public class TaskTypeController{
     @Autowired
     private TaskTypeService taskRepository;
 
     @GetMapping
-    public ResponseEntity<List<TaskTypeDTO>> getAll() {
+    public ResponseEntity<List<TaskTypeResponse>> getAll() {
         List<TaskTypeDTO> typeTaskDTOs = taskRepository.getAll();
-        return new ResponseEntity<>(typeTaskDTOs,HttpStatus.OK);
+        List<TaskTypeResponse> taskTypeResponse = convertersTask.convertesListDTOsInResponse(typeTaskDTOs);
+        return new ResponseEntity<>(taskTypeResponse,HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskTypeDTO> getForId(@PathVariable Long id){
 
-        Optional<TaskTypeDTO> tOptional = taskRepository.getById(id);
-        return new ResponseEntity<>(tOptional.get(),HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskTypeResponse> getForId(@PathVariable Long id){
+        Optional<TaskTypeDTO> taskOpt = taskRepository.getById(id);
+        TaskTypeResponse taskTypeResponse = convertersTask.convertesDTOInResponseTaskType(taskOpt.get());
+        return new ResponseEntity<>(taskTypeResponse,HttpStatus.OK);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id){
         taskRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
     @PostMapping
-    public ResponseEntity<TaskTypeDTO> register(@RequestBody TaskTypeDTO typeTaskDTO){
-        typeTaskDTO = taskRepository.register(typeTaskDTO);
-        return new ResponseEntity<>(typeTaskDTO,HttpStatus.CREATED);
+    public ResponseEntity<TaskTypeResponse> register(@RequestBody TaskTypeRequest taskTypeRequest){
+        TaskTypeDTO typeTaskDTO = taskRepository.register(
+            convertersTask.convertesRequestInDTOTaskType(taskTypeRequest)
+        );
+        TaskTypeResponse taskTypeResponse = convertersTask.convertesDTOInResponseTaskType(typeTaskDTO);
+        return new ResponseEntity<>(taskTypeResponse,HttpStatus.CREATED);
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<TaskTypeDTO> update(@RequestBody TaskTypeDTO typeTaskDTO,@PathVariable Long id){
-        typeTaskDTO = taskRepository.update(id, typeTaskDTO);
-        return new ResponseEntity<>(typeTaskDTO,HttpStatus.OK);
+    public ResponseEntity<TaskTypeResponse> update(@RequestBody TaskTypeRequest taskTypeRequest,@PathVariable Long id){
+        TaskTypeDTO taskTypeDTO = taskRepository.update(
+            id, 
+           convertersTask.convertesRequestInDTOTaskType(taskTypeRequest)
+            );
+        TaskTypeResponse taskTypeResponse = convertersTask.convertesDTOInResponseTaskType(taskTypeDTO);
+        return new ResponseEntity<>(taskTypeResponse,HttpStatus.OK);
     }
 
 }

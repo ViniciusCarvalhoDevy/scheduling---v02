@@ -4,14 +4,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beautysalon.scheduling.service.CustomerService;
 import com.beautysalon.scheduling.shared.CustomerDTO;
-import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
-import com.beautysalon.scheduling.view.model.Customer.CustomerResponse;
+import com.beautysalon.scheduling.util.functions.customer.convertersCustomer;
+import com.beautysalon.scheduling.view.model.CustomerHttp.CustomerRequest;
+import com.beautysalon.scheduling.view.model.CustomerHttp.CustomerResponse;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,43 +25,49 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/restfull/v01/client")
-public class CustomerController implements instancesGlobal {
+@RequestMapping("/restfull/v01/customer")
+public class CustomerController {
     
     @Autowired
-    private CustomerService clientService;
+    private CustomerService customerService;
 
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAll() {
-        List<CustomerResponse> customerResponses = (clientService.getAll()).stream()
-        .map(cust -> mapper.map(cust, CustomerResponse.class))
-        .collect(Collectors.toList());
+        List<CustomerResponse> customerResponses = convertersCustomer.convertesListDTOsInResponse((customerService.getAll()));
         return new ResponseEntity<>(customerResponses,HttpStatus.OK);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getForId(@PathVariable Long id){
-
-        Optional<CustomerDTO> custumerDTO = clientService.getById(id);
-        CustomerResponse customerResponse = mapper.map(custumerDTO.get(), CustomerResponse.class);
+        Optional<CustomerDTO> custumerDTO = customerService.getById(id);
+        CustomerResponse customerResponse = convertersCustomer.convertesDTOInResponseCustomer(custumerDTO.get());
         return new ResponseEntity<>(customerResponse,HttpStatus.OK);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id){
-        clientService.delete(id);
+        customerService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
     @PostMapping
-    public ResponseEntity<CustomerResponse> register(@RequestBody CustomerDTO clientDTO){
-        clientDTO = clientService.register(clientDTO);
-        CustomerResponse customerResponse = mapper.map(clientDTO, CustomerResponse.class);
+    public ResponseEntity<CustomerResponse> register(@RequestBody CustomerRequest customerRequest){
+        CustomerDTO customerDTO = customerService.register(
+            convertersCustomer.convertesRequestInDTOCustomer(customerRequest)
+        );
+        CustomerResponse customerResponse = convertersCustomer.convertesDTOInResponseCustomer(customerDTO);
         return new ResponseEntity<>(customerResponse,HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> update(@RequestBody CustomerDTO clientDTO,@PathVariable Long id){
-        clientDTO = clientService.update(id, clientDTO);
-        CustomerResponse customerResponse = mapper.map(clientDTO, CustomerResponse.class);
+    public ResponseEntity<CustomerResponse> update(@RequestBody CustomerRequest customerRequest,@PathVariable Long id){
+        CustomerDTO customerDTO = customerService.update(
+            id, 
+            convertersCustomer.convertesRequestInDTOCustomer(customerRequest)
+        );
+        CustomerResponse customerResponse = convertersCustomer.convertesDTOInResponseCustomer(customerDTO);
         return new ResponseEntity<>(customerResponse,HttpStatus.CREATED);
     }
+    
 
 
     

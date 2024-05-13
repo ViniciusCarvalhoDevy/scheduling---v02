@@ -3,7 +3,6 @@ package com.beautysalon.scheduling.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,64 +11,53 @@ import com.beautysalon.scheduling.model.Customer;
 import com.beautysalon.scheduling.model.exception.ResourceNotFoundException;
 import com.beautysalon.scheduling.repository.CustomerRepository;
 import com.beautysalon.scheduling.shared.CustomerDTO;
-import com.beautysalon.scheduling.util.interfaces.instancesGlobal;
-
+import com.beautysalon.scheduling.util.functions.customer.convertersCustomer;
 @Service
-public class CustomerService implements instancesGlobal{
+public class CustomerService{
 
     @Autowired
     private CustomerRepository customerRepository;
     
     public List<CustomerDTO> getAll(){
-        
-        List<Customer> client = customerRepository.findAll();
-        
-        if(client.isEmpty()){
-            throw new ResourceNotFoundException("Nenhum Cliente Encontrado!");
-        }
-        List<CustomerDTO> clientDTOs = client.stream()
-        .map(cl -> mapper.map(cl,CustomerDTO.class))
-        .collect(Collectors.toList());
-     
-        return clientDTOs;
-
+        List<Customer> customers = customerRepository.findAll();
+        isEmpty(customers);
+        List<CustomerDTO> customerDTOs = convertersCustomer.convertesListCustomerInDTOs(customers);
+        return customerDTOs;
     }
     public Optional<CustomerDTO> getById(Long id){
-
-        Optional<Customer> client = customerRepository.findById(id);
-        CustomerDTO clientDTO =mapper.map(client.get(), CustomerDTO.class);
-
-        return Optional.of(clientDTO);
-        
+        Optional<Customer> customerOpt = customerRepository.findById(id);
+        CustomerDTO customerDTO = convertersCustomer.convertesCustomerInDTO(customerOpt.get());
+        return Optional.of(customerDTO);
     }
     
-    public CustomerDTO register(CustomerDTO clientDTO){
-        
-        Customer client = mapper.map(clientDTO,Customer.class);
-        client = customerRepository.save(client);
-        clientDTO.setId(client.getId());
-        return clientDTO;
-        
+    public CustomerDTO register(CustomerDTO customerDTO){
+        Customer customer = convertersCustomer.convertesDTOInCustomer(customerDTO);
+        customer = customerRepository.save(customer);
+        customerDTO.setId(customer.getId());
+        return customerDTO;   
     }
+
     public void delete(Long id){
         customerRepository.deleteById(id);
     }
 
-    public CustomerDTO update(Long id, CustomerDTO clientDTO){
-
-        clientDTO.setId(id);
-        Customer client =mapper.map(clientDTO, Customer.class);
-        client = customerRepository.save(client);
-        
-        return clientDTO;
-        
+    public CustomerDTO update(Long id, CustomerDTO customerDTO){
+        customerDTO.setId(id);
+        Customer customer = convertersCustomer.convertesDTOInCustomer(customerDTO);
+        customer = customerRepository.save(customer);
+        return customerDTO;
     }
     public List<CustomerDTO> findAllByIdClient(List<Long> ids){
-        List<CustomerDTO> dClientDTOs = (customerRepository.findAllById(ids)).stream()
-        .map(cl -> mapper.map(cl,CustomerDTO.class))
-        .collect(Collectors.toList());
+        List<CustomerDTO> dClientDTOs = convertersCustomer.convertesListCustomerInDTOs((customerRepository.findAllById(ids)));
         return dClientDTOs;
     }
+    private void isEmpty(List<Customer> customers){
+        if(customers.isEmpty()){
+            throw new ResourceNotFoundException("Nenhum Cliente Encontrado!");
+        }
+    }
+
+   
     }
 
 
