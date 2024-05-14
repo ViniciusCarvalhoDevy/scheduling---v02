@@ -38,14 +38,14 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponse> getForId(@PathVariable Long id){
+    public ResponseEntity<CustomerResponse> getForId(@PathVariable Long id) throws Exception{
         Optional<CustomerDTO> custumerDTO = customerService.getById(id);
         CustomerResponse customerResponse = convertersCustomer.convertesDTOInResponseCustomer(custumerDTO.get());
         return new ResponseEntity<>(customerResponse,HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    public ResponseEntity<?> delete(@PathVariable Long id) throws Exception{
         customerService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -59,7 +59,7 @@ public class CustomerController {
         return new ResponseEntity<>(customerResponse,HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> update(@RequestBody CustomerRequest customerRequest,@PathVariable Long id){
+    public ResponseEntity<CustomerResponse> update(@RequestBody CustomerRequest customerRequest,@PathVariable Long id) throws Exception{
         CustomerDTO customerDTO = customerService.update(
             id, 
             convertersCustomer.convertesRequestInDTOCustomer(customerRequest)

@@ -35,14 +35,14 @@ public class TaskTypeController{
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskTypeResponse> getForId(@PathVariable Long id){
+    public ResponseEntity<TaskTypeResponse> getForId(@PathVariable Long id) throws Exception{
         Optional<TaskTypeDTO> taskOpt = taskRepository.getById(id);
         TaskTypeResponse taskTypeResponse = convertersTask.convertesDTOInResponseTaskType(taskOpt.get());
         return new ResponseEntity<>(taskTypeResponse,HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    public ResponseEntity<?> delete(@PathVariable Long id)throws Exception{
         taskRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -57,7 +57,7 @@ public class TaskTypeController{
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskTypeResponse> update(@RequestBody TaskTypeRequest taskTypeRequest,@PathVariable Long id){
+    public ResponseEntity<TaskTypeResponse> update(@RequestBody TaskTypeRequest taskTypeRequest,@PathVariable Long id)throws Exception{
         TaskTypeDTO taskTypeDTO = taskRepository.update(
             id, 
            convertersTask.convertesRequestInDTOTaskType(taskTypeRequest)

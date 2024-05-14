@@ -24,7 +24,8 @@ public class CustomerService{
         List<CustomerDTO> customerDTOs = convertersCustomer.convertesListCustomerInDTOs(customers);
         return customerDTOs;
     }
-    public Optional<CustomerDTO> getById(Long id){
+    public Optional<CustomerDTO> getById(Long id) throws Exception{
+        existCustomer(id);
         Optional<Customer> customerOpt = customerRepository.findById(id);
         CustomerDTO customerDTO = convertersCustomer.convertesCustomerInDTO(customerOpt.get());
         return Optional.of(customerDTO);
@@ -37,11 +38,13 @@ public class CustomerService{
         return customerDTO;   
     }
 
-    public void delete(Long id){
+    public void delete(Long id) throws Exception{
+        existCustomer(id);
         customerRepository.deleteById(id);
     }
 
-    public CustomerDTO update(Long id, CustomerDTO customerDTO){
+    public CustomerDTO update(Long id, CustomerDTO customerDTO) throws Exception{
+        existCustomer(id);
         customerDTO.setId(id);
         Customer customer = convertersCustomer.convertesDTOInCustomer(customerDTO);
         customer = customerRepository.save(customer);
@@ -54,6 +57,11 @@ public class CustomerService{
     private void isEmpty(List<Customer> customers){
         if(customers.isEmpty()){
             throw new ResourceNotFoundException("Nenhum Cliente Encontrado!");
+        }
+    }
+    private void existCustomer(Long id) throws Exception{
+        if(!this.customerRepository.existsById(id)){
+            throw new ResourceNotFoundException("Nenhum Cliente Encontrado com esse Id!");
         }
     }
 

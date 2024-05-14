@@ -23,7 +23,8 @@ public class TaskTypeService{
         List<TaskTypeDTO> typeTaskDTOs = convertersTask.convertesListTaskTypeInDTOs(taskTypes);
         return typeTaskDTOs;
     }
-    public Optional<TaskTypeDTO> getById(Long id){
+    public Optional<TaskTypeDTO> getById(Long id)throws Exception{
+        existTask(id);
         Optional<TaskType> taskOpt = taskTypeRepository.findById(id);
         TaskTypeDTO taskTypeDTO = convertersTask.convertesTaskTypeInDTO(taskOpt.get());
         return Optional.of(taskTypeDTO);  
@@ -36,11 +37,13 @@ public class TaskTypeService{
         return taskTypeDTO;
     }
 
-    public void delete(Long id){
+    public void delete(Long id)throws Exception{
+        existTask(id);
         taskTypeRepository.deleteById(id);
     }
 
-    public TaskTypeDTO update(Long id, TaskTypeDTO taskTypeDTO){
+    public TaskTypeDTO update(Long id, TaskTypeDTO taskTypeDTO)throws Exception{
+        existTask(id);
         taskTypeDTO.setId(id);
         TaskType taskType = convertersTask.convertesDTOInTaskType(taskTypeDTO);
         taskType = taskTypeRepository.save(taskType);
@@ -54,6 +57,11 @@ public class TaskTypeService{
     private void isEmpty(List<TaskType> taskTypes){
         if(taskTypes.isEmpty()){
             throw new ResourceNotFoundException("Nenhum Serviço Encontrado!");
+        }
+    }
+    private void existTask(Long id) throws Exception{
+        if(!this.taskTypeRepository.existsById(id)){
+            throw new ResourceNotFoundException("Nenhum Serviço Encontrado com esse ID!");
         }
     }
 

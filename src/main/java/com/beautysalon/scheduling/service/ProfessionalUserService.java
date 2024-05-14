@@ -29,6 +29,7 @@ public class ProfessionalUserService{
 
     public Optional<ProfessionalUserDTO> getById(Long id_sender,Long id) throws Exception{
         validIfIsAdmin(id_sender);
+        existProfessional(id);
         Optional<ProfessionalUser> professOptional = professionalUserRepository.findById(id);
         ProfessionalUserDTO professionalUserDTO = convertersProfessional.convertesProfessionalUserInDTO(professOptional.get());
         return Optional.of(professionalUserDTO);
@@ -56,11 +57,13 @@ public class ProfessionalUserService{
     }
     public void delete(Long id_sender,Long id) throws Exception{
         validIfIsAdmin(id_sender);
+        existProfessional(id);
         professionalUserRepository.deleteById(id);
     }
 
     public ProfessionalUserDTO update(Long id_sender,Long id, ProfessionalUserDTO professionalUserDTO) throws Exception{
         validIfIsAdmin(id_sender);
+        existProfessional(id);
         professionalUserDTO.setId(id);
         professionalUserDTO.setIsAdmin(false);
         ProfessionalUser professionalUser = convertersProfessional.convertesDTOInProfessionalUser(professionalUserDTO);
@@ -92,6 +95,11 @@ public class ProfessionalUserService{
     private void isEmpty(List<ProfessionalUser> professionalUsers){
         if(professionalUsers.isEmpty()){
             throw new ResourceNotFoundException("Nenhum Funcionário Cadastrado!");
+        }
+    }
+    private void existProfessional(Long id){
+        if(!this.professionalUserRepository.existsById(id)){
+            throw new ResourceNotFoundException("Nenhum Funcionário Encontrado com esse ID!");
         }
     }
     private void isPasswordOfAdm(Long password){

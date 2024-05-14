@@ -32,7 +32,7 @@ public class SchedulingService{
     }
 
     public Optional<SchedulingDTO> getById(Long id){
-        schedulingExist(schedulingRepository,id);
+        existScheduling(id);
         Optional<Scheduling> schedOptional = schedulingRepository.findById(id);
         SchedulingDTO schedulingDTO = convertersScheduling.convertesSchedulingInDTO(schedOptional.get());
         return Optional.of(schedulingDTO);
@@ -86,20 +86,20 @@ public class SchedulingService{
     }
 
     public void delete(Long id){
-        schedulingExist(schedulingRepository,id);
+        existScheduling(id);
         schedulingRepository.deleteById(id);
     }
 
     public SchedulingDTO update(Long id, SchedulingDTO schedulingDTO){
-        schedulingExist(schedulingRepository,id);
+        existScheduling(id);
         schedulingDTO.setId(id);
         Scheduling scheduling = convertersScheduling.convertesDTOInScheduling(schedulingDTO);
         scheduling = schedulingRepository.save(scheduling);
         schedulingDTO.setTotalValueTask(scheduling.getTotalValueTask());
         return schedulingDTO;
     }
-    public void schedulingExist(SchedulingRepository schedulingRepository,Long id){
-        if(!schedulingRepository.existsById(id)){
+    public void existScheduling(Long id){
+        if(!this.schedulingRepository.existsById(id)){
             throw new ResourceNotFoundException("Esse Agendamento não existe!");
         }
     }

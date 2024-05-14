@@ -36,7 +36,6 @@ public class validModelScheduling implements instancesGlobal {
       }
       
       ifIdsEntityFoundCallException();
-
     }
 
     public void ifIdsEntityFoundCallException() throws Exception{
